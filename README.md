@@ -1,13 +1,14 @@
-# FantasyBasketball
+# FantasyFootball Predictions
 Data and Analytics to help me make football predictions
 
 ##Tasks
-1. Get raw data From nba.com
-	- Find XHR request containing all players and their ids
-	- Download the last link and save it in my data folder
-	- Extract all current players and their ids and place into a separate .csv file
-	- Find XHR request to get player statistics
-	- Manipulate different parameters in XHR request to data from other seasons
+1. Get 2015 fantasy nfl projection data from espn.com (top 300)
+	- Write script to get player names, expected draft positions, and projected points
 	- Download all data and place in downloads folder
-3. Machine learning on data
-4. Produce graphical models of the results
+2. Get 2015 fantasy nfl actual data from espn.com (top 300)
+	- Write script to get all player names, games played, and total scored points
+	- Download all data and place in downloards folder
+3. Create a linear regression of draft position vs. expected points (analyze)
+4. Create a linear regression of expected points vs. actual points (analyze)
+5. Clustering algorithm to get best players vs. draft position 
+6. Produce graphical models of the results

@@ -12,16 +12,25 @@ index_increment = 15
 start_index = 0
 baseurl = "http://games.espn.go.com/ffl/tools/projections?display=alt&startIndex="
 
+names = []
+
 #cycle through pages 
-for i in range(startIndex, num_players, index_increment):
-	#Set the url and read in the raw html
-	url = baseurl + str(i)
-	html = urlopen(url).read()
-    soup = BeautifulSoup(html, "lxml")
+for index in range(start_index, num_players, index_increment):
+    #Set the url and read in the raw html
+    url = baseurl + str(index)
+    html = urlopen(url).read()
+    soup = BeautifulSoup(html, "html.parser")
     
     #find flex pop which describes the player name
-    boccat = soup.find("dl", "flexpop")
-    category_links = [BASE_URL + dd.a["href"] for dd in boccat.findAll("dd")]
-    return category_links
+    names_elms = soup.find_all("a", "flexpop", )
+    for elm in names_elms:
+        val = elm.string
+        if len(val.split(" ")) >= 3:
+            #names.append(val)
+            print(val)
+    print(index)
+
+print(names)
+print(len(names))
 
 #write csv file
