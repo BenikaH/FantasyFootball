@@ -27,13 +27,6 @@ for index in range(start_index, num_players, index_increment):
     url = baseurl + str(index)
     html = urlopen(url).read()
     soup = BeautifulSoup(html, "html.parser")
-    
-    #base player dictionary to add stats to
-    player2014 = {}
-    player2015 = {}
-    for field in headers:
-        player2014[field] = '--'
-        player2015[field] = '--'
 
     #used to understand draft position as well as for debugging
     count = 1
@@ -41,6 +34,13 @@ for index in range(start_index, num_players, index_increment):
     #find flex pop which describes the player name
     table_elms = soup.find_all("table", "tableBody")
     for tab in table_elms:
+        #base player dictionary to add stats to
+        player2014 = {}
+        player2015 = {}
+        for field in headers:
+            player2014[field] = '--'
+            player2015[field] = '--'
+
         #get player name
         player_name = tab.find("a","flexpop").string
 
@@ -147,7 +147,7 @@ for index in range(start_index, num_players, index_increment):
 
 
 #write csv file
-with open('../formatted_data/2015proj.csv', 'w') as csvfile:
+with open('../formatted_data/2015proj.csv', 'w') as csvfile:    
     writer = csv.DictWriter(csvfile, fieldnames=headers, delimiter=',', quoting=csv.QUOTE_NONNUMERIC)
     writer.writeheader()
     for piece in allproj2015:
