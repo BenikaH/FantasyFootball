@@ -22,12 +22,18 @@ for index in range(start_index, num_players, index_increment):
     soup = BeautifulSoup(html, "html.parser")
     
     #find flex pop which describes the player name
-    names_elms = soup.find_all("a", "flexpop", )
-    for elm in names_elms:
-        val = elm.string
-        if len(val.split(" ")) >= 3:
-            #names.append(val)
-            print(val)
+    table_elms = soup.find_all("table", "tableBody")
+    for tab in names_elms:
+        #get player name
+        player_name = table_elms[0].find("a","flexpop").string
+
+        #get position and team initial
+        brline = str(table_elms[0].find("nobr"))
+        pos_end_loc = brline.find("</nobr>")
+        pos_name = brline[pos_end_loc-2,pos_end_loc]
+        team_name = brline[pos_end_loc-6:pos_end_loc-3]
+
+        
     print(index)
 
 print(names)
