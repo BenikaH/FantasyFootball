@@ -4,7 +4,7 @@
 
 #setup
 setwd("/home/neeraj/Documents/Projects/FantasyFootball/data/formatted_data")
-raw_data <- read.csv("2015proj.csv", header=TRUE, dec = ".", sep = ",", na.strings = "--")
+raw_data <- read.csv("2015proj.csv", header=TRUE, dec = ".", sep = ",", na.strings = "--", stringsAsFactors = FALSE)
 raw_data$PTS <- as.double(raw_data$PTS)
 
 #Create a plot with a regression (marked by player position)
@@ -42,3 +42,40 @@ abline(kfit, col = "red")
 df_data <- raw_data[raw_data$Position == "D/ST",]
 dffit <- lm(PTS ~ Draft, data = df_data)
 abline(dffit, col = "orange")
+
+
+
+#Plots for different positions
+#Runnings backs
+plot(rb_data$Draft, rb_data$PTS, col="blue")
+abline(rbfit, col = "blue")
+
+#Wide Receivers
+plot(wr_data$Draft, wr_data$PTS, col="purple")
+abline(wrfit, col = "purple")
+
+#Quarterbacks
+qbnames = unlist(strsplit(qb_data$Name, " "))
+qblast = qbnames[seq(2,length(qbnames),2)]
+plot(qb_data$Draft, qb_data$PTS, col="green")
+with(qb_data, text(PTS~Draft, labels = qblast, pos = 3))
+abline(qbfit, col = "green")
+
+#Tightends
+tenames = unlist(strsplit(te_data$Name, " "))
+telast = tenames[seq(2,length(tenames),2)]
+plot(te_data$Draft, te_data$PTS, col="lightblue")
+with(te_data, text(PTS~Draft, labels = telast, pos = 3))
+abline(tefit, col = "lightblue")
+
+#Defenses
+plot(df_data$Draft, df_data$PTS, col="orange")
+with(df_data, text(PTS~Draft, labels = df_data$Name, pos = 3))
+abline(dffit, col = "orange")
+
+#Kickers
+knames = unlist(strsplit(k_data$Name, " "))
+klast = knames[seq(2,length(knames),2)]
+plot(k_data$Draft, k_data$PTS, col="red")
+with(k_data, text(PTS~Draft, labels = klast, pos = 3))
+abline(kfit, col = "red")
