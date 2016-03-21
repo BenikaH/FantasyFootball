@@ -15,7 +15,7 @@ baseurl = "http://games.espn.go.com/ffl/tools/projections?display=alt&startIndex
 
 #set headers for csv
 kicker_headers = ["1-39A", "1-39C", "40-49A", "40-49C", "50+A", "50+C", "TOTA", "TOTC", "XPA", "XPC"]
-headers = ["Name", "Position", "Draft", "RUSH", "RUSHYDS", "RUSHAVG", "RUSHTD", "TAR", "REC", "RECYDS", "RECAVG", "RECTD", "C", "A", "COMPYDS", "COMPTD", "INT", "SCK", "DINT", "FR", "DTD", "PA", "YA"] + kicker_headers + ["PTS"]
+headers = ["Name", "Position", "Draft", "RUSH", "RUSHYDS", "RUSHAVG", "RUSHTD", "TAR", "REC", "RECYDS", "RECAVG", "RECTD", "C", "A", "COMPYDS", "COMPTD", "INT", "SCK", "DINT", "FR", "DTD", "PA", "YA"] + kicker_headers + ["PTS", "TEAM"] 
 
 
 allstats2014 = []
@@ -147,14 +147,14 @@ for index in range(start_index, num_players, index_increment):
 
 
 #write csv file
-with open('../raw_data/2015proj.csv', 'w') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=headers, delimiter=',')
+with open('../formatted_data/2015proj.csv', 'w') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=headers, delimiter=',', quoting=csv.QUOTE_NONNUMERIC)
     writer.writeheader()
     for piece in allproj2015:
         writer.writerow(piece)
 
-with open('../raw_data/2014stats.csv', 'w') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=headers, delimiter=',')
+with open('../formatted_data/2014stats.csv', 'w') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=headers, delimiter=',', quoting=csv.QUOTE_NONNUMERIC)
     writer.writeheader()
     for piece in allstats2014:
         writer.writerow(piece)
