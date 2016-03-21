@@ -33,7 +33,19 @@ for index in range(start_index, num_players, index_increment):
         pos_name = brline[pos_end_loc-2,pos_end_loc]
         team_name = brline[pos_end_loc-6:pos_end_loc-3]
 
-        
+        #get all stats
+        allstats = tab.findAll("td", "playertableStat")
+        statsres = []
+        for stat in allstats:
+            val = stat.contents[0].string
+            statsres.append(val)
+
+        #get projected points
+        allpts = tab.findAll("td", "playertableStat appliedPoints")
+        pts2014 = allpts[1].string
+        proj2015 = allpts[2].string
+
+    #put in place for progress purposes only        
     print(index)
 
 print(names)
