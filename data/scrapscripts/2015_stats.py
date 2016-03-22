@@ -12,7 +12,7 @@ index_increment = 50
 start_index = 0
 baseurl = "http://games.espn.go.com/ffl/leaders?&startIndex="
 
-headers = ["Name", "Position", "Rank", "RUSH", "RUSHYDS", "RUSHTD", "TAR", "REC", "RECYDS", "RECTD", "C", "A", "COMPYDS", "COMPTD", "INT"] + ["PTS", "TEAM"]
+headers = ["Name", "Position", "Rank", "RUSH", "RUSHYDS", "RUSHTD", "TAR", "REC", "RECYDS", "RECTD", "C", "A", "COMPYDS", "COMPTD", "INT", "TWOPC", "FUM", "MISCTD"] + ["PTS", "TEAM"]
 
 for index in range(start_index, num_players, index_increment):
     #Set the url and read in the raw html
@@ -47,10 +47,29 @@ for index in range(start_index, num_players, index_increment):
         if len(position) > 10:
             position = position[:position.find("\xc2")]
 
-        
+        player2015["Position"] = position
+        player2015["TEAM"] = team
 
         #Get all season statistics
         stats = tab.findAll("td", "playertableStat")
-        stats[0].split("/")[0]
-        stats[0].split("/")[1]
+        player2015["C"] = int(stats[0].string.split("/")[0])
+        player2015["A"] = int(stats[0].string.split("/")[1])
+        player2015["COMPYDS"] = int(stats[1].string)
+        player2015["COMPTD"] = int(stats[2].string)
+        player2015["INT"] = int(stats[3].string)
+        player2015["RUSH"] = int(stats[4].string)
+        player2015["RUSHYDS"] = int(stats[5].string)
+        player2015["RUSHTD"] = int(stats[6].string)
+        player2015["REC"] = int(stats[7].string)
+        player2015["RECYDS"] = int(stats[8].string)
+        player2015["RECTD"] = int(stats[9].string)
+        player2015["TAR"] = int(stats[10].string)
+        player2015["TWOPC"] = int(stats[11].string)
+        player2015["FUM"] = int(stats[12].string)
+        player2015["MISCTD"] = int(stats[13].string)
 
+        #add points and rank
+        player2015["PTS"] = int(tab.find("td", "playertableStat appliedPoints sortedCell").string)
+        player2015["Rank"] = rank
+
+        print(player2015)
