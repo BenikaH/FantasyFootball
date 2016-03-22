@@ -7,7 +7,7 @@ from urllib2 import urlopen
 import csv
 
 #parameters
-num_players = 350
+num_players = 50
 index_increment = 50
 start_index = 0
 baseurl = "http://games.espn.go.com/ffl/leaders?&startIndex="

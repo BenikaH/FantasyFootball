@@ -6,6 +6,7 @@
 setwd("/home/neeraj/Documents/Projects/FantasyFootball/data/formatted_data")
 raw_data <- read.csv("2015proj.csv", header=TRUE, dec = ".", sep = ",", na.strings = "--", stringsAsFactors = FALSE)
 raw_data$PTS <- as.double(raw_data$PTS)
+raw_data$Position <- factor(raw_data$Position)
 
 #Create a plot with a regression (marked by player position)
 title <- "Draft Position vs. Expected Points"
