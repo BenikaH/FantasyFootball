@@ -20,12 +20,19 @@ for index in range(start_index, num_players, index_increment):
     html = urlopen(url).read()
     soup = BeautifulSoup(html, "html.parser")
 
+    #rank count
+    rank = 1
+
     #extract all player rows
     table_enteries = soup.findAll("tr", "pncPlayerRow")
 
     for tab in table_enteries:
+        #create player dictionary to insert stats into
+        player2015 = {}
+
+
         #extract the name of the player
-        name = tab.find("a", "flexpop").string
+        player2015["Name"] = tab.find("a", "flexpop").string
 
         #extract team name and position
         line = str(tab.find("td", "playertablePlayerName"))
@@ -36,4 +43,14 @@ for index in range(start_index, num_players, index_increment):
         else:
             team = por[:por.find("\xa0")-1]
 
-        print(name, team, position)
+        #Deal with injuries to players 
+        if len(position) > 10:
+            position = position[:position.find("\xc2")]
+
+        
+
+        #Get all season statistics
+        stats = tab.findAll("td", "playertableStat")
+        stats[0].split("/")[0]
+        stats[0].split("/")[1]
+
