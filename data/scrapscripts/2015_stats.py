@@ -1,5 +1,7 @@
+##Neeraj Asthana
+##Fantasy Football Predicion
+##3/22/2016
 ###Script to get ESPN 2015 stats for top 400 players
-#http://games.espn.go.com/ffl/leaders?&startIndex=0
 
 #libraries
 from bs4 import BeautifulSoup

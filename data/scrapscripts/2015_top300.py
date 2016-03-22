@@ -1,4 +1,9 @@
+##Neeraj Asthana
+##Fantasy Football Predicion
+##3/22/2016
 ###Script to get ESPN 2015 projections and 2014 statistics for top 300 players
+
+
 #base page: http://games.espn.go.com/ffl/tools/projections?display=alt
 #next page: http://games.espn.go.com/ffl/tools/projections?display=alt&startIndex=15
 

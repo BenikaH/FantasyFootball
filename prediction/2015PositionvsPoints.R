@@ -1,9 +1,12 @@
 ##Neeraj Asthana
 ##Fantasy Football Predicion
+##3/21/2016
 ##Regression: 2015 draft position vs. expected number of points
 
 #setup
 setwd("/home/neeraj/Documents/Projects/FantasyFootball/data/formatted_data")
+
+#read in and formatted ESPN predictions for 2015 season
 raw_data <- read.csv("2015proj.csv", header=TRUE, dec = ".", sep = ",", na.strings = "--", stringsAsFactors = FALSE)
 raw_data$PTS <- as.double(raw_data$PTS)
 raw_data$Position <- factor(raw_data$Position)
