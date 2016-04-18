@@ -1,6 +1,10 @@
 # FantasyFootball Predictions
 Data and Analytics to help me make football predictions
 
+##References:
+* http://www.pro-football-reference.com/
+* espn.com
+
 ##Tasks
 1. Get 2015 fantasy nfl projection data from espn.com (top 300)
 	- Write script to get player names, expected draft positions, and projected points
