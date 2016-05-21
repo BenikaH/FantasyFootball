@@ -1,0 +1,301 @@
+---
+title: "Project"
+author: "Neeraj Asthana"
+date: "May 10, 2016"
+output: pdf_document
+---
+
+#Extra Credit Project
+##Stat 428: Statistical Computing
+##Neeraj Asthana (nasthan2)
+
+##Introduction
+
+Instead of extending ideas we learned in class, for my project I decided to do something more practical and analyze a real dataset. For my Extra Credit project for STAT 428, I chose to analyze a 2015 Fantasy Football dataset and apply methods we have learned in class to that dataset.
+
+Every summer ESPN.com releases a projections list that forecasts how each NFL player will perform and how many "fantasy" points they will score in the upcoming season. An example list of these projections can be seen at: http://games.espn.go.com/ffl/tools/projections
+
+The goal of my project is to analyze these projections and understand how accurate they compared to how players actually end up performing. I will look at the 2015 Fantasy Football season and compare each player's projected fantasy points to how many points they ended up scoring in the 2015 season. On top of that I will attempt to build and select a regression model using the projection listings as predictors for the actual amount of fantasy football points. I will use the jackknife cross validation method to select features and to compare the models (using the mean squared errors). I will only be looking at the Running Back (RB), Wide Receiver (WR), and TightEnd (TE) positions individually as these are the most relevant positions in fantasy football. Additionally, each of the positions is extremely different and requires a different model. 
+
+##Setup 
+
+All of the data used in this project comes from espn.com and I have included these datasets with the report. They are labelled "2015proj.csv" and "2015data.csv". 
+
+The "2015proj.csv" file contains data for how well ESPN believes a specific NFL player will perform in the 2015 season. Each row represents a single player and includes data on the estimated numbers of certain statistics such as touchdowns, receptions, yards, fantasy points, etc. that ESPN forecasts they will score. "2015proj.csv" has 405 rows and 35 columns. 
+
+The "2015data.csv" file contains data on how well NFL players actually performed in the 2015 season. Each row represents a single player and includes data on the numbers of certain statistics such as touchdowns, receptions, yards, fantasy points, etc they actually got in the 2015 NFL season. "2015data.csv" has 400 rows and 20 columns. I will only end up using the "PTS" column from this dataset which is the actual number of fantasy football points scored by every player. 
+
+I will begin by first reading in the files and then I will manipulate the data so that it can easily be inputted into a linear regression model (easily put into the lm function). 
+
+###Reading files and partially display data
+
+I will begin by reading in the "2015proj.csv" and "2015data.csv" files using R's "read.csv" function. I also display the first few rows of each of these files using the head function so that the reader has a better idea of what the data looks like. 
+
+```{r cars}
+options(warn=-1)
+#setwd("/home/neeraj/Documents/Projects/FantasyFootball/data/formatted_data")
+
+#data for projected number of points in 2015
+proj <- read.csv("2015proj.csv")
+head(proj)
+
+#data for actual 2015 statistics (what players actually scored)
+actual <- read.csv("2015stats.csv")
+head(actual)
+```
+
+
+###Cleaning the data
+
+The data must be cleaned before it can be modelled or analyzed. 
+
+I begin the cleaning process by first merging the the proj and actual datasets to have all of the predictors and the response variable in a single dataset (called *first*). I will merge on the name of the player as this is field is the same for both datasets. 
+
+```{r}
+#Many of the columns in the proj dataset were read as factors instead of actual numeric values so these values must be cast to actual numeric values. 
+for(i in c(4:17,34)){
+  proj[,c(i)] <- as.numeric(as.character(proj[,c(i)]))
+}
+
+first <- merge(proj, actual, by.x = "Name", by.y = "Name", suffixes = c("proj","actual"))
+dim(first)
+```
+
+The first data structure has 335 rows and 54 columns. Many of the columns are not necessary as they contain statstics for Kicking, Passing, and Defense which irrelevant to the positions I am analyzing. Therefore, many of the columns will dropped as they are not being used as predictors. 
+
+There are fewer rows than expected in the first dataset because some players are not in both datasets. Most of the players that are not included are extremely irrelevant and would not be on fantasy footall teams anyways so it is okay that they are not included. However there are a few notable players on the missing players list including "Marlon brown", "Pierre thomas", "Charcandrick West", and "Rishard Matthews" who had very good seasons but only because other players had injuries. However, almost all of the important players are included in the first dataset so I will proceed with the next steps. There a total of 135 missing players which are listed below.
+
+
+```{r}
+#Many of the columns in the proj dataset were read as factors instead of actual numeric values so these values must be cast to actual numeric values. 
+#find which players are missing from the dataset
+allnames <- union(proj[,"Name"], actual[,"Name"])
+missing <- allnames[!allnames %in% first[,"Name"]]
+missing
+```
+
+##Performance and Modelling
+
+Each position is extremely different so I will subset different positions: RB, WR, TE
+
+Removal of unnessary columns -> Defensive, and Kicking and repeated columns (Teams, Positions)
+
+###Jackknife Cross Validation Function
+
+"crossvalidation" is a helper function that takes as input a formula for a lm function and a dataset and returns the mean squared error for fitting that model using jackknife crossvalidation. The function will fit the model on all but one point and use the last point as a test point and compare the expected result to the actual result to get an error value. The error values are then squared and summed across all points. This sum along with the average AIC for each model is returned. 
+
+```{r}
+crossvalidation <- function(fit, dataset, labelcol){
+  n <- dim(dataset)[1]
+  totalMSE <- numeric(n)
+  AICs <- numeric(n)
+  for(i in 1:n){
+    x <- dataset[-i,]
+    y <- dataset[i,-labelcol]
+    truey <- dataset[i,labelcol]
+    
+    model <- lm(fit, data = x)
+    
+    #estimated value from model of left out point
+    est <- predict(model, y, type = "response")
+    mse <- (truey - est)^2
+    totalMSE[i] <- mse
+    
+    #AIC of model
+    AICs[i] <- AIC(model)
+  }
+  return (c(mean(totalMSE), mean(AICs)))
+}
+```
+
+###Running backs
+
+I will begin my analysis by modelling Running Back performance. I first subset the data to ensure that I only have running backs in the dataset (rbs). I will then remove any column that does not correspond to running back performance. The columns I include are Name, Position, Draft Position, Projected number of Rushes, Porject number of Rushing Yards, Projected Rushing Average, Projected Number of Receptions, Projected Number of Receiving Yards, Projected Number of Receiving Touchdowns, Projected Number of Fantasy Points, and Actual Number of fantasy points scored (response). The dataset has 85 rows and 11 columns. A sampling of the dataset is provided below. 
+
+```{r}
+raw_rbs <- first[,"Positionproj"] == "RB"
+
+#include only the necessary columns for running back
+rbs <- first[raw_rbs,c(1:6,9,10,12,34,53)]
+head(rbs)
+```
+
+I have plotted the projected fantasy points by the actual number of fantasy points scored. The plot demonstrates that the ESPN projections for running backs is not very accurate as the data is extremely scattered and there is no general trend. 
+
+```{r}
+plot(rbs$PTSproj, rbs$PTSactual, col = "blue")
+with(rbs, text(PTSactual ~ PTSproj, labels = Name, pos = 1, cex = .5))
+```
+
+I will now attempt to fit many different models for the running backs and select the best one using the jackknife cross validated AIC and mean squared error values. The results are held in the rbresults matrix and will be displayed after modelling all 8 of the fits. 
+
+```{r}
+rbresults <- matrix(0, 8, 3)
+colnames(rbresults) <- c("terms", "MSE", "AIC")
+
+#different possible fits
+fit1 <- formula(PTSactual ~ PTSproj)
+rbresults[1,] <- c(1, crossvalidation(fit1, rbs, 11))
+
+fit2 <- formula(PTSactual ~ PTSproj + Draft)
+rbresults[2,] <- c(2, crossvalidation(fit2, rbs, 11))
+
+fit3 <- formula(PTSactual ~ PTSproj + Draft + RUSHAVG)
+rbresults[3,] <- c(3, crossvalidation(fit3, rbs, 11))
+
+fit4 <- formula(PTSactual ~ PTSproj + Draft + RUSHAVG + RECproj)
+rbresults[4,] <- c(4, crossvalidation(fit4, rbs, 11))
+
+fit5 <- formula(PTSactual ~ Draft + RUSHproj + RUSHYDSproj + RUSHAVG + RECproj + RECYDSproj + RECTDproj)
+rbresults[5,] <- c(7, crossvalidation(fit5, rbs, 11))
+
+fit6 <- formula(PTSactual ~ Draft)
+rbresults[6,] <- c(1, crossvalidation(fit6, rbs, 11))
+
+fit7 <- formula(PTSactual ~ Draft + RUSHproj + RUSHYDSproj + RUSHAVG + RECproj + RECYDSproj + RECTDproj + PTSproj)
+rbresults[7,] <- c(8, crossvalidation(fit7, rbs, 11))
+
+fit8 <- formula(PTSactual ~ Draft + RUSHproj + RUSHYDSproj + RECproj + RECYDSproj + RECTDproj + PTSproj)
+rbresults[8,] <- c(7, crossvalidation(fit8, rbs, 11))
+
+rbresults
+```
+
+The best model appears to be "fit6" which uses only 1 predictor, "Draft". "Draft" is the draft position of the running back and using only this predictor seems ideal to predict fantasy points for the injury prone running back position. "fit6" has a jackknife crossvalidated MSE of 1918.914 and a jackknife crossvalidated AIC of 875.8967, both of which are the lowest of all 8 models. 
+
+The worst model appears to be "fit7" which uses all 8 of the predictors. It is interesting that the most informed model (8 predictors) performs the worst in practice, however, there is probably high correlation among the variables. "fit7" has a jackknife crossvalidated MSE of 2192.313 and a jackknife crossvalidated AIC of 885.6611, both of which are the highest of all 8 models. 
+
+###Wide Receivers
+
+I will now shift my focus and model Wide Reciever performance. I first subset the data to ensure that I only have wide receivers in the dataset (wrs). I will then remove any column that does not correspond to wide receiver performance. The columns I include are Name, Position, Draft Position, Projected number of Rushes, Porject number of Rushing Yards, Projected Number of Targets, Projected Number of Receptions, Projected Number of Receiving Yards, Projected number of average Receiving yards, Projected Number of Fantasy Points, and Actual Number of fantasy points scored (response). The dataset has 106 rows and 11 columns. A sampling of the dataset is provided below. 
+
+```{r}
+raw_wrs <- first[,"Positionproj"] == "WR"
+
+#include only the necessary columns for wide receivers
+wrs <- first[raw_wrs,c(1:5,8:11,34,53)]
+wrs[which(is.na(wrs[,"TARproj"])), "TARproj"] = 0 #slight cleaning necessary
+head(wrs)
+```
+
+I have plotted the projected fantasy points by the actual number of fantasy points scored for the wide receivers. The plot demonstrates that the ESPN projections for wide receivers is more accurate than the running backs however it is still extremely scattered and there is slight positive correlation to the data (projections somewhat match actual points scored). 
+
+```{r}
+plot(wrs$PTSproj, wrs$PTSactual, col = "blue")
+with(wrs, text(PTSactual ~ PTSproj, labels = Name, pos = 3, cex= .5))
+```
+
+I will now attempt to fit many different models for the wide receivers and select the best one using the jackknife cross validated AIC and mean squared error values. The results are held in the wrresults matrix and will be displayed after modelling all 10 of the fits. 
+
+```{r}
+wrresults <- matrix(0, 10, 3)
+colnames(wrresults) <- c("terms", "MSE", "AIC")
+
+#different possible fits
+fit1 <- formula(PTSactual ~ PTSproj)
+wrresults[1,] <- c(1, crossvalidation(fit1, wrs, 11))
+
+fit2 <- formula(PTSactual ~ PTSproj + Draft)
+wrresults[2,] <- c(2, crossvalidation(fit2, wrs, 11))
+
+fit3 <- formula(PTSactual ~ PTSproj + Draft + RECAVG)
+wrresults[3,] <- c(3, crossvalidation(fit3, wrs, 11))
+
+fit4 <- formula(PTSactual ~ PTSproj + Draft + RECAVG + RECproj)
+wrresults[4,] <- c(4, crossvalidation(fit4, wrs, 11))
+
+fit5 <- formula(PTSactual ~ Draft + RUSHYDSproj + RUSHproj + RECproj + RECYDSproj)
+wrresults[5,] <- c(5, crossvalidation(fit5, wrs, 11))
+
+fit6 <- formula(PTSactual ~ RECproj)
+wrresults[6,] <- c(1, crossvalidation(fit6, wrs, 11))
+
+fit7 <- formula(PTSactual ~ Draft + RUSHproj + RUSHYDSproj + TARproj + RECproj + RECYDSproj + RECAVG + PTSproj)
+wrresults[7,] <- c(8, crossvalidation(fit7, wrs, 11))
+
+fit8 <- formula(PTSactual ~ Draft + TARproj + RECproj + RECYDSproj + RECAVG + PTSproj)
+wrresults[8,] <- c(6, crossvalidation(fit8, wrs, 11))
+
+fit9 <- formula(PTSactual ~ Draft + TARproj + PTSproj)
+wrresults[9,] <- c(3, crossvalidation(fit9, wrs, 11))
+
+fit10 <- formula(PTSactual ~ TARproj)
+wrresults[10,] <- c(1, crossvalidation(fit10, wrs, 11))
+
+wrresults
+```
+
+The best model appears to be "fit10" which uses only 1 predictor, "TARproj". "TARproj" is the ESPN projected number of targets a wide receiver will get and using only this predictor seems ideal to predict fantasy points for this position. The number of targets a wide receiver gets seems to be extremely important to their performance. "fit10" has a jackknife crossvalidated MSE of 1768.037 and a jackknife crossvalidated AIC of 1084.585, both of which are the lowest of all 10 models. This model is closely followed by "fit6" which only uses "RECproj" as a predictor. "RECproj" is the ESPN projected number of receptions a wide receiver will get and this also seems extremely important to a wide receiver's actual performance. 
+
+The worst model appears to be "fit7" which uses all 8 of the predictors. It is interesting that the most informed model (8 predictors) performs the worst in practice, however, there is probably high correlation among the variables. "fit7" has a jackknife crossvalidated MSE of 2995.891 and a jackknife crossvalidated AIC of 1090.164. The MSE is the highest among all of the fits, however, the AIC is second highest only to fit3. 
+
+In general, the models for wide receivers have lower jackknife crossvalidated mean squared error when compared to the models for running back even though their are more wide recievers than running backs in the dataset. This suggests that the models for wide recievers perform better in practice than the models for running backs. 
+
+###Tight Ends
+
+I will now shift my focus and model Tight End performance. I first subset the data to ensure that I only have tight ends in the dataset (tes). I will then remove any column that does not correspond to tight end performance. The columns I include are Name, Position, Draft Position, Projected Number of Targets, Projected Number of Receptions, Projected Number of Receiving Yards, Projected Average of Receiving yards, Projected Number of Fantasy Points, and Actual Number of fantasy points scored (response). The dataset has 44 rows and 9 columns. A sampling of the dataset is provided below. 
+
+```{r}
+raw_tes <- first[,"Positionproj"] == "TE"
+
+#include only the necessary columns for wide receivers
+tes <- first[raw_tes,c(1:3,8:11,34,53)]
+head(tes)
+```
+
+I have plotted the projected fantasy points by the actual number of fantasy points scored for the tight ends. The plot demonstrates that the ESPN projections for tight ends is more accurate than the running backs and wide receivers as the data is not very scattered and there is a positive correlation to the data (projections match actual points scored). 
+
+```{r}
+plot(tes$PTSproj, tes$PTSactual, col = "blue")
+with(tes, text(PTSactual ~ PTSproj, labels = Name, pos = 3, cex = .5))
+```
+
+I will now attempt to fit many different models for the tight ends and select the best one using the jackknife cross validated AIC and mean squared error values. The results are held in the teresults matrix and will be displayed after modelling all 10 of the fits.
+
+```{r}
+teresults <- matrix(0, 10, 3)
+colnames(teresults) <- c("terms", "MSE", "AIC")
+
+#different possible fits
+fit1 <- formula(PTSactual ~ PTSproj)
+teresults[1,] <- c(1, crossvalidation(fit1, tes, 9))
+
+fit2 <- formula(PTSactual ~ PTSproj + Draft)
+teresults[2,] <- c(2, crossvalidation(fit2, tes, 9))
+
+fit3 <- formula(PTSactual ~ PTSproj + Draft + RECAVG)
+teresults[3,] <- c(3, crossvalidation(fit3, tes, 9))
+
+fit4 <- formula(PTSactual ~ PTSproj + Draft + RECAVG + RECproj)
+teresults[4,] <- c(4, crossvalidation(fit4, tes, 9))
+
+fit5 <- formula(PTSactual ~ Draft + RECproj + RECYDSproj)
+teresults[5,] <- c(3, crossvalidation(fit5, tes, 9))
+
+fit6 <- formula(PTSactual ~ RECproj)
+teresults[6,] <- c(1, crossvalidation(fit6, tes, 9))
+
+fit7 <- formula(PTSactual ~ TARproj + RECproj)
+teresults[7,] <- c(2, crossvalidation(fit7, tes, 9))
+
+fit8 <- formula(PTSactual ~ Draft + TARproj + RECproj + RECYDSproj + RECAVG + PTSproj)
+teresults[8,] <- c(6, crossvalidation(fit8, tes, 9))
+
+fit9 <- formula(PTSactual ~ Draft + TARproj + PTSproj)
+teresults[9,] <- c(3, crossvalidation(fit9, tes, 9))
+
+fit10 <- formula(PTSactual ~ TARproj)
+teresults[10,] <- c(1, crossvalidation(fit10, tes, 9))
+
+teresults
+```
+
+The best model appears to be "fit6" which uses only 1 predictor, "RECproj". "RECproj" is the ESPN projected number of receptions a tight end will get and using only this predictor seems ideal to predict fantasy points for this position. The number of receptions a tight end gets seems to be extremely important to their performance. "fit6" has a jackknife crossvalidated MSE of 1191.044 and a jackknife crossvalidated AIC of 427.1958, both of which are the lowest of all 10 models. This model is closely followed by "fit10" which only uses "TARproj" as a predictor. "TARproj" is the ESPN projected number of targets a tight end will get and this also seems extremely important to a tight end's actual performance. However, the combined model of both "RECproj" and "TARproj" did not perform as well as the other 2 models (fit7).
+
+The worst model appears to be "fit8" which uses all 6 of the predictors. It is interesting that the most informed model (6 predictors) performs the worst in practice, however, there is probably high correlation among the variables. "fit8" has a jackknife crossvalidated MSE of 1686.413 and a jackknife crossvalidated AIC of 433.4905 both of which are the highest among the 10 fits. 
+
+In general, the models for tightends have lower jackknife crossvalidated mean squared error and AICs when compared to the models for running backs and wide receivers. This is probably do to the fact that there are less tight ends than the wide receivers and running backs.  
+
+##Results
+
+In general the jackknife crossvalidation worked pretty well for model evaluation for this dataset. It was interesting to see that the smaller models (with 1 predictor) tended to do much better than the larger models (with all predictors). The larger models tend to have higher jackknife crossvalidated MSEs and AICs. The fits for wide receivers and tightends was much better than the fits for running backs in general.
