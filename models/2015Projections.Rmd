@@ -1,0 +1,48 @@
+---
+title: "2015 Projections"
+author: "Neeraj Asthana"
+date: "May 21, 2016"
+output: pdf_document
+---
+
+#2015 Fantasy Football Projections
+
+##Summary
+
+This notebook is looking to predict player performance in the 2015 Fantasy Football season based on how players are projected to perform. 
+
+##Reading dataset
+
+The data set was obtained from:
+
+I wrote a scraping script in python and then used the find all feature in Sublime to remove all of the quotations.
+
+Basic cleaning to get numerics in the columns
+
+```{r setup, include=FALSE}
+setwd("/home/neeraj/Documents/Projects/FantasyFootball/data/formatted_data")
+data <- read.csv("2015espnprojstats.csv", header = TRUE, na.strings = "--")
+data[,1] <- unlist(lapply(data[,1], as.character))
+
+for (i in 5:16){
+  data[,i] <- as.numeric(data[,i])
+}
+
+#what fantasy players actually scored and performed
+actual <- read.csv("2015stats.csv")
+```
+
+###Size of the dataset
+
+```{r}
+print(dim(data))
+```
+
+###Column names
+
+```{r}
+print(names(data))
+```
+
+##Visualizations
+
