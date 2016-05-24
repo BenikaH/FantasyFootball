@@ -30,6 +30,9 @@ for (i in 5:16){
 
 #what fantasy players actually scored and performed
 actual <- read.csv("2015stats.csv")
+
+#dataset containing ages and all pro selections
+ages <- read.csv("2015ages.csv", stringsAsFactors=FALSE)
 ```
 
 ###Size of the dataset
@@ -41,7 +44,9 @@ print(dim(data))
 ###Column names
 
 ```{r}
-print(names(data))
+head(data)
+
+head()
 ```
 
 ##Visualizations
