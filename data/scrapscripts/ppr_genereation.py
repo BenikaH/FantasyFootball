@@ -1,5 +1,5 @@
 '''
-Takes 2015esponprojstats.csv and 2016esponprojstats.csv and transforms from standard scoring to ppr scoring
+Takes 2015esponprojstats.csv and 2016esponprojstats.csv and transforms them from standard scoring to ppr scoring
 Takes full file name (starting from ~/...) as first command line argument
 '''
 import csv
