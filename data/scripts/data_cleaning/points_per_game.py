@@ -20,7 +20,8 @@ per_game = round(df.ix[:,scoring_format]/df.ix[:,"G"],2)
 
 df[scoring_format+"pg"] = per_game
 
-#/home/neeraj/Documents/Projects/FantasyFootball/data/actual_fantasy_pts_scored/ppr/ppr_fantasy_2016.csv
-write_file = file_loc[:file_loc.rfind(".")-5] + "_per_game" + file_loc[file_loc.rfind(".")-5:]
+#original loc: /home/neeraj/Documents/Projects/FantasyFootball/data/actual_fantasy_pts_scored/ppr/ppr_fantasy_2016.csv
+# No longer writing out to a new file. Putting data is separate file in old csv
+#write_file = file_loc[:file_loc.rfind(".")-5] + "_per_game" + file_loc[file_loc.rfind(".")-5:]
 
-print(df.to_csv(write_file))
+print(df.to_csv(file_loc))
