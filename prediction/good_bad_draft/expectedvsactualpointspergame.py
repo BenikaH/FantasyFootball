@@ -11,6 +11,10 @@ if len(sys.argv) < 3:
 projs = pd.read_csv(sys.argv[1])
 actual = pd.read_csv(sys.argv[2])
 
+djname = actual["Name"] != "David Johnson"
+djposnotTE = actual["FantPos"] != "TE"
+actual = actual[[x or y for x, y in zip(djname, djposnotTE)]]
+
 projs = projs.ix[:,["Name","PTS"]]
 
 # Get displaying position. If none is specified, just displays all positions
