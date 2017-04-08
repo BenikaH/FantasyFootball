@@ -1,4 +1,4 @@
-Rk,Name,Tm,FantPos,Age,G,GS,Cmp,Att,Yds,TD,Int,RushAtt,RushYds,Y/A,RushTD,Tgt,Rec,RecYds,Y/R,RecTD,FantPt,DKPt,FDPt,VBD,PosRank,OvRank,FantPtpg
+Rk,Name,Tm,FantPos,Age,G,GS,Cmp,PassAtt,PassYds,PassTD,Int,RushAtt,RushYds,Y/A,RushTD,Tgt,Rec,RecYds,Y/R,RecTD,FantPt,DKPt,FDPt,VBD,PosRank,OvRank,FantPtpg
 1,Aaron Rodgers,GNB,QB,31,16,16.0,341,520,4381,38,5,43,269,6.26,2,0.0,0,0,,0,358.0,367.1,359.1,93.0,1,12.0,22.38
 2,Andrew Luck,IND,QB,25,16,16.0,380,616,4761,40,16,64,273,4.27,3,0.0,0,0,,0,356.0,379.7,367.7,90.0,2,13.0,22.25
 3,Russell Wilson,SEA,QB,26,16,16.0,285,452,3475,20,7,118,849,7.19,6,1.0,1,17,17.0,0,332.0,343.6,337.1,66.0,3,21.0,20.75
