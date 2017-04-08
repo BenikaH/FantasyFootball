@@ -63,6 +63,28 @@ for index, row in team_stats.iterrows():
 
 
 # Step 3 - Match players with team stats
-df = pd.merge(actual, team_stats,on="Tm", suffixes=["","Tm"])
+df = pd.merge(actual, team_stats,on="Tm", suffixes=["", "Tm"])
 
 # Step 4 - Add columns with player stats subtracted from team totals (accurate team contribution)
+#['Rk', 'Name', 'Tm', 'FantPos', 'Age', 'G', 'GS', 'Cmp', 'PassAtt', 'PassYds', 'PassTD', 'Int', 
+# 'RushAtt', 'RushYds', 'Y/A', 'RushTD', 'Tgt', 'Rec', 'RecYds', 'Y/R', 'RecTD', 'FantPt', 'DKPt', 
+# 'FDPt', 'VBD', 'PosRank', 'OvRank', 'FantPtpg', 'RkTm', 'PF', 'TotalYds', 'Ply', 'Y/P', 'TO', 
+# 'FL', 'Pass1stD', 'CmpTm', 'PassAttTm', 'PassYdsTm', 'PassTDTm', 'IntTm', 'NY/A', 'Rush1stD', 
+# 'RushAttTm', 'RushYdsTm', 'RushTDTm', 'Y/ATm', 'Rush1stD.1', 'Pen', 'PenYds', '1stPy', 'Sc%', 'TO%', 'EXP']
+
+#Receiving/Pass - yds, tds, att, c, int    Rush - yds, tds, att
+df["RushTDTmSans"] = df["RushTDTm"] - df["RushTD"]
+df["RushAttTmSans"] = df["RushAttTm"] - df["RushAtt"]
+df["RushYdsTmSans"] = df["RushYdsTm"] - df["RushYds"]
+
+df["CmpTmSans"] = df["CmpTm"] - df["Cmp"]
+df["PassAttTmSans"] = df["PassAttTm"] - df["PassAtt"]
+df["PassYdsTmSans"] = df["PassYdsTm"] - df["PassYds"]
+df["PassTDTmSans"] = df["PassTDTm"] - df["PassTD"]
+df["IntTmSans"] = df["IntTm"] - df["Int"]
+
+df["RecTmSans"] = df["CmpTm"] - df["Rec"]
+df["TgtTmSans"] = df["PassAttTm"] - df["Tgt"]
+df["RecYdsTmSans"] = df["PassYdsTm"] - df["RecYds"]
+df["RecTDTmSans"] = df["PassTDTm"] - df["RecTD"]
+print(df)
