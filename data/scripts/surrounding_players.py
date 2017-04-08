@@ -14,6 +14,9 @@ import pandas as pd
 
 team_stats_file = sys.argv[1]
 actual_file = sys.argv[2]
+output_file_name = "surrounding_" + team_stats_file
+if len(sys.argv) > 3:
+    output_file_name = sys.argv[3]
 
 team_stats = pd.read_csv(sys.argv[1])
 actual = pd.read_csv(sys.argv[2])
@@ -55,7 +58,8 @@ team_dictionary = {
     "Houston Texans": "HOU",
     "New York Jets": "NYJ",
     "Cleveland Browns": "CLE",
-    "Los Angeles Rams": "LAR"
+    "Los Angeles Rams": "LAR",
+    "St. Louis Rams": "STL"
 }
 
 for index, row in team_stats.iterrows():
@@ -87,4 +91,6 @@ df["RecTmSans"] = df["CmpTm"] - df["Rec"]
 df["TgtTmSans"] = df["PassAttTm"] - df["Tgt"]
 df["RecYdsTmSans"] = df["PassYdsTm"] - df["RecYds"]
 df["RecTDTmSans"] = df["PassTDTm"] - df["RecTD"]
-print(df)
+
+# Step 5 - write csv
+df.to_csv(output_file_name, index=False)
