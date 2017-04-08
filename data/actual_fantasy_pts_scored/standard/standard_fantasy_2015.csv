@@ -1,4 +1,4 @@
-Rk,Name,Tm,FantPos,Age,G,GS,Cmp,Att,Yds,TD,Int,Att.1,Yds.1,Y/A,TD.1,Tgt,Rec,Yds.2,Y/R,TD.2,FantPt,DKPt,FDPt,VBD,PosRank,OvRank,FantPtpg
+Rk,Name,Tm,FantPos,Age,G,GS,Cmp,Att,Yds,TD,Int,RushAtt,RushYds.1,Y/A,RushTD,Tgt,Rec,RecYds,Y/R,RecTD,FantPt,DKPt,FDPt,VBD,PosRank,OvRank,FantPtpg
 1,Cam Newton,CAR,QB,26.0,16,16,296,495,3837,35,10,132,636,4.82,10,0,0,0,,0,391.0,409.1,399.1,106.0,1,6.0,24.44
 2,Tom Brady,NWE,QB,38.0,16,16,402,624,4770,36,7,34,53,1.56,3,1,1,36,36.0,0,344.0,356.7,351.2,59.0,2,22.0,21.5
 3,Russell Wilson,SEA,QB,27.0,16,16,329,483,4024,34,8,103,553,5.37,1,0,0,0,,0,342.0,353.3,344.3,57.0,3,23.0,21.38
