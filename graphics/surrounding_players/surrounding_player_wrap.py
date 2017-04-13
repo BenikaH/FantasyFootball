@@ -62,7 +62,10 @@ colors_and_labels = np.array([position_to_color(player) for index,player in df.i
 
 if len(sys.argv) > 5:
     if per_game:
-        df[actual_column + "pg"] = df[actual_column]/df["G"]
+        if "Sans" in actual_column:
+            df[actual_column + "pg"] = df[actual_column]/16
+        else: 
+            df[actual_column + "pg"] = df[actual_column]/df["G"]
         actual_column = actual_column +"pg"
     df = df.sort_values(projs_column, ascending=False).head(int(size))
 
