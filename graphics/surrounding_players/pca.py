@@ -9,11 +9,14 @@ import matplotlib.pyplot as plt
 
 # Options include either 2014, 2015, 2016
 year = sys.argv[1]
+size = sys.argv[2]
 file_name = "../../data/surrounding_players/surrounding_players_" + year + ".csv"
  
 #read file into data frame and reduce to just QB
 df = pd.read_csv(file_name)
 df = df[df.FantPos == "QB"]
+df = df.sort_values("FantPtpg", ascending=False).head(int(size))
+
 
 
 fantPt = df["FantPt"]
@@ -39,8 +42,13 @@ pca.fit(df,fantPtpg)
 
 #plot first 2 components
 transformed_new = pca.fit_transform(df)
-print(np.array(transformed_new)[:,1])
+
 plt.scatter(np.array(transformed_new)[:,0],np.array(transformed_new)[:,1])
-#plt.title(year + " Skree Plot for QB")
-#plt.xlabel("component")
+plt.title(year + " top " + str(size) + " QB 2 Component PCA")
+
+for i in range(len(name)):
+    player_name = name.iloc[i]
+    player_name = player_name[0] + ". " + player_name.split(" ")[-1] + " - " + str(fantPtpg.iloc[i])
+    plt.annotate(player_name, xy=(transformed_new[i,0],transformed_new[i,1]), textcoords='data')
+
 plt.show()
