@@ -19,7 +19,12 @@ df = pd.read_csv(actual_file_name)
 multiplier = 16.0/df["G"]
 
 # column names to normalize
-column_names = ["Cmp","PassAtt","PassYds","PassTD","Int","RushAtt","RushYds","Y/A","RushTD","Tgt","Rec","RecYds","Y/R","RecTD","FantPt"]
+if "ppr" in actual_file_name:
+    column_names = ["Cmp","PassAtt","PassYds","PassTD","Int","RushAtt","RushYds","Y/A","RushTD","Tgt","Rec","RecYds","Y/R","RecTD","FantPprPt"]
+    extra_columns = ["DKPt","FDPt","VBD","PosRank","OvRank","FantPprPtpg"]
+else:
+    column_names = ["Cmp","PassAtt","PassYds","PassTD","Int","RushAtt","RushYds","Y/A","RushTD","Tgt","Rec","RecYds","Y/R","RecTD","FantPt"]
+    extra_columns = ["DKPt","FDPt","VBD","PosRank","OvRank","FantPtpg"]
 
 #column names that have unaltered values that are indentifying and create dataframe
 result_df = df[["Rk","Name","Tm","FantPos","Age","G","GS"]].copy()
@@ -27,7 +32,6 @@ for column_name in column_names:
     result_df[column_name] = df[column_name] if "/" in column_name else np.round(df[column_name]*multiplier,1)
 
 #extra columns to add at the end. Not quite sure what some of these mean...
-extra_columns = ["DKPt","FDPt","VBD","PosRank","OvRank","FantPtpg"]
 for column_name in extra_columns:
     result_df[column_name] = df[column_name]
 
