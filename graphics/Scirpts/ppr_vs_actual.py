@@ -23,8 +23,6 @@ if position is not "ALL":
 df = df.reset_index()
 del df["index"]
 
-print(df)
-
 x = df["FantPtpg"]
 y = df["FantPprPtpg"]
 names = df["Name"]
@@ -48,6 +46,8 @@ colors_and_labels = np.array([position_to_color(player) for index,player in df.i
 fig = plt.figure()
 ax = fig.add_subplot(111)
 plt.scatter(x,y, c = colors_and_labels)
+plt.plot(range(1+int(min(max(x),max(y)))))
+plt.grid(linestyle='--')
 
 #Add names to plot
 for i,xy in enumerate(zip(x, y)):
@@ -61,3 +61,5 @@ plt.ylabel("PPR per game")
 plt.xlabel("Standard per game")
 
 plt.show()
+
+plt.savefig('/home/neeraj/Documents/Projects/FantasyFootball/graphics/ppr_vs_standard/'+year+'_'+position+'_PPR_vs_Standard.png')
