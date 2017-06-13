@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 year = sys.argv[1]
 size = sys.argv[2]
 position = sys.argv[3]
-file_name = "../../data/surrounding_players/surrounding_players_" + year + ".csv"
+file_name = "../../data/surrounding_players/normalized_standard_surrounding/surrounding_players_" + year + ".csv"
  
 #read file into data frame and reduce to just QB
 df = pd.read_csv(file_name)
